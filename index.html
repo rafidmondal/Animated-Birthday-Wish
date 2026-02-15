@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Magic ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh; color: white;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .container { width: 100%; max-width: 450px; padding: 20px; }
+        .card {
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px);
+            border-radius: 30px; padding: 30px; border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center;
+        }
+        .logo {
+            font-family: 'Righteous', cursive; font-size: 2.2rem;
+            background: linear-gradient(135deg, #ff2e97, #00f0ff, #ffd700);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+        .subtitle { font-size: 0.9rem; color: #00f0ff; margin-bottom: 25px; opacity: 0.8; }
+        .group { text-align: left; margin-bottom: 15px; }
+        label {
+            display: block; font-size: 0.8rem; color: #ffd700;
+            margin-bottom: 5px; font-weight: 600; text-transform: uppercase;
+        }
+        input, textarea {
+            width: 100%; padding: 10px 15px; font-size: 0.95rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2); color: white;
+            border-radius: 12px; margin-bottom: 12px; outline: none;
+        }
+        input:focus, textarea:focus { border-color: #ff2e97; }
+        .dates { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .file-btn {
+            width: 100%; padding: 12px; background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 255, 255, 0.2); border-radius: 12px;
+            cursor: pointer; color: white; margin-bottom: 10px; font-size: 0.95rem;
+        }
+        .preview { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
+        .preview div { height: 80px; border-radius: 10px; overflow: hidden; border: 2px solid #ff2e97; }
+        .preview img { width: 100%; height: 100%; object-fit: cover; }
+        .btn {
+            width: 100%; background: linear-gradient(135deg, #ff2e97, #ff6b9d);
+            color: white; padding: 12px; font-size: 1rem; border: none;
+            border-radius: 50px; cursor: pointer; font-weight: 600;
+        }
+        .btn:disabled { opacity: 0.5; }
+        #status { margin-top: 10px; font-size: 0.85rem; color: #00f0ff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="logo">Birthday Magic ✨</div>
+            <p class="subtitle">Create surprise wish</p>
+            
+            <div class="group">
+                <label>Name *</label>
+                <input type="text" id="name" placeholder="Friend's Name">
+                
+                <label>Birth Date (Optional)</label>
+                <div class="dates">
+                    <input type="number" id="day" placeholder="DD" min="1" max="31">
+                    <input type="number" id="month" placeholder="MM" min="1" max="12">
+                    <input type="number" id="year" placeholder="YYYY">
+                </div>
+                
+                <label>Message (Optional)</label>
+                <textarea id="msg" placeholder="Your message..." rows="3"></textarea>
+                
+                <label>Photos (Max 2)</label>
+                <input type="file" id="file" accept="image/*" multiple style="display:none" onchange="preview()">
+                <button class="file-btn" onclick="document.getElementById('file').click()">📷 Select</button>
+                <div class="preview" id="pv"></div>
+            </div>
+
+            <button class="btn" onclick="create()">✨ Create</button>
+            <p id="status"></p>
+        </div>
+    </div>
+
+    <script>
+        const API = "https://urneinbrxacnwojhuvut.supabase.co/rest/v1/posts";
+        const KEY = "sb_publishable_xLnFSAUTtuwpcdBjL2mu7w_k-zekj1K";
+        
+        let files = [];
+
+        function preview() {
+            files = Array.from(document.getElementById('file').files).slice(0, 2);
+            const pv = document.getElementById('pv');
+            pv.innerHTML = '';
+            files.forEach(f => {
+                const r = new FileReader();
+                r.onload = e => pv.innerHTML += `<div><img src="${e.target.result}"></div>`;
+                r.readAsDataURL(f);
+            });
+        }
+
+        // Convert to base64 with compression
+        async function toBase64(file) {
+            return new Promise((ok, err) => {
+                const r = new FileReader();
+                r.onload = e => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const c = document.createElement('canvas');
+                        let w = img.width, h = img.height;
+                        const max = 400;
+                        if (w > h && w > max) { h *= max/w; w = max; }
+                        else if (h > max) { w *= max/h; h = max; }
+                        c.width = w; c.height = h;
+                        c.getContext('2d').drawImage(img, 0, 0, w, h);
+                        // Get base64 without prefix
+                        const base64 = c.toDataURL('image/jpeg', 0.6).split(',')[1];
+                        ok(base64);
+                    };
+                    img.onerror = err;
+                    img.src = e.target.result;
+                };
+                r.onerror = err;
+                r.readAsDataURL(file);
+            });
+        }
+
+        async function create() {
+            const name = document.getElementById('name').value.trim();
+            if (!name) return alert("Name required!");
+
+            const btn = event.target;
+            const st = document.getElementById('status');
+            btn.disabled = true;
+            btn.textContent = "Processing...";
+
+            try {
+                // Convert photos to base64
+                let code1 = null, code2 = null;
+                
+                if (files.length > 0) {
+                    st.textContent = "Converting photo 1...";
+                    code1 = await toBase64(files[0]);
+                    console.log("Photo 1 base64 length:", code1.length);
+                }
+                
+                if (files.length > 1) {
+                    st.textContent = "Converting photo 2...";
+                    code2 = await toBase64(files[1]);
+                    console.log("Photo 2 base64 length:", code2.length);
+                }
+
+                st.textContent = "Saving...";
+
+                // Prepare data
+                const d = document.getElementById('day').value;
+                const m = document.getElementById('month').value;
+                const y = document.getElementById('year').value;
+                const msg = document.getElementById('msg').value.trim();
+                
+                const date = (d && m && y) ? `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}` : null;
+                
+                const data = {
+                    name: name,
+                    birth_date: date,
+                    message: msg || "Wishing you a wonderful birthday! 🎂",
+                    photo_url: code1,
+                    photo_url_2: code2
+                };
+                
+                console.log("📊 Data to save:");
+                console.log("- name:", data.name);
+                console.log("- photo_url length:", data.photo_url ? data.photo_url.length : 0);
+                console.log("- photo_url_2 length:", data.photo_url_2 ? data.photo_url_2.length : 0);
+
+                // Save to database
+                const res = await fetch(API, {
+                    method: "POST",
+                    headers: {
+                        "apikey": KEY,
+                        "Authorization": `Bearer ${KEY}`,
+                        "Content-Type": "application/json",
+                        "Prefer": "return=representation"
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                console.log("📡 Save response status:", res.status);
+
+                if (!res.ok) {
+                    const err = await res.text();
+                    console.error("❌ Save error:", err);
+                    throw new Error("Save failed");
+                }
+
+                const saved = await res.json();
+                console.log("✅ Saved data:", saved);
+                const id = saved[0].id;
+                
+                console.log("🆔 Saved with ID:", id);
+                console.log("📸 Saved photo_url length:", saved[0].photo_url ? saved[0].photo_url.length : 0);
+                st.textContent = "Success!";
+                
+                setTimeout(() => {
+                    location.href = `index2.html?id=${id}`;
+                }, 500);
+
+            } catch (e) {
+                console.error(e);
+                st.textContent = "Error!";
+                btn.disabled = false;
+                btn.textContent = "✨ Create";
+                alert("Failed! Check console (F12)");
+            }
+        }
+    </script>
+</body>
+</html>
