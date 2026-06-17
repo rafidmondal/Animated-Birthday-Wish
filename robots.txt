@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://rafidmondal.github.io/Animated-Birthday-Wish/sitemap.xml
