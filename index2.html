@@ -4,13 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Happy Birthday! 🎂</title>
-    <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Righteous&family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root{
+            --bg1:#1a1a2e; --bg2:#16213e; --bg3:#0f3460;
+            --card-bg: rgba(255,255,255,0.05); --card-border: rgba(255,255,255,0.1);
+            --txt:#ffffff; --gold:#ffd700; --pill-bg: rgba(255,255,255,0.1);
+            --msg-bg: rgba(255,255,255,0.08); --sh-bg: rgba(255,255,255,0.03);
+        }
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            min-height: 100vh; color: white;
+            background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 50%, var(--bg3) 100%);
+            min-height: 100vh; color: var(--txt);
             display: flex; justify-content: center; align-items: center;
         }
         .bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
@@ -25,18 +31,30 @@
         }
         .box { width: 100%; max-width: 600px; padding: 20px; z-index: 10; }
         .card {
-            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(16px);
-            border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 30px 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: var(--card-bg); backdrop-filter: blur(16px);
+            border-radius: 30px; border: 1px solid rgba(255,215,0,0.18);
+            padding: 34px 22px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,215,0,0.04) inset;
+            transition: background .6s ease, border-color .6s ease;
         }
-        .cake { font-size: 3.5rem; margin-bottom: 5px; animation: bnc 1s infinite; }
-        @keyframes bnc { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-10px) scale(1.1); } }
+        .top-title{ margin-bottom: 18px; }
+        .ht-small{
+            font-family: 'Poppins', sans-serif; font-size: 0.85rem; font-weight: 600;
+            letter-spacing: 6px; color: var(--gold);
+            text-shadow: 0 0 12px rgba(255,215,0,.6);
+        }
+        .ht-big{
+            font-family: 'Lobster', cursive; font-size: 2.6rem; line-height: 1.15;
+            background: linear-gradient(135deg, #ffe07a, #ffd700 40%, #d4a017 70%, #ffe07a);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            text-shadow: 0 0 18px rgba(255,215,0,.35);
+            margin-top: 2px;
+        }
         
-        .pic { margin: 20px auto 25px; width: 200px; height: 200px; position: relative; }
+        .pic { margin: 8px auto 22px; width: 200px; height: 200px; position: relative; }
         .glow {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 260px; height: 260px;
-            background: radial-gradient(circle, rgba(0,150,255,0.9) 0%, rgba(0,200,255,0.6) 30%, rgba(100,200,255,0.4) 50%, transparent 75%);
+            background: radial-gradient(circle, rgba(255,215,0,0.55) 0%, rgba(0,200,255,0.5) 35%, rgba(100,200,255,0.3) 55%, transparent 75%);
             filter: blur(40px); border-radius: 50%; z-index: 1; animation: pls 3s ease-in-out infinite alternate;
         }
         @keyframes pls {
@@ -44,11 +62,12 @@
             100% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
         }
         .frame {
-            width: 100%; height: 100%; border-radius: 50%; border: 5px solid rgba(0,180,255,0.7);
+            width: 100%; height: 100%; border-radius: 50%; border: 4px solid rgba(255,215,0,0.55);
             overflow: hidden; position: relative; z-index: 2;
-            box-shadow: 0 0 40px rgba(0,150,255,0.9), 0 0 80px rgba(0,150,255,0.5), inset 0 0 30px rgba(0,150,255,0.3);
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            box-shadow: 0 0 30px rgba(255,215,0,.6), 0 0 60px rgba(0,150,255,0.45), inset 0 0 30px rgba(0,150,255,0.3);
+            background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 50%, var(--bg3) 100%);
             display: flex; align-items: center; justify-content: center;
+            transition: background .6s ease;
         }
         .ph {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -66,39 +85,138 @@
         .img.on { opacity: 1; }
 
         .nm {
-            font-size: 2.5rem; font-weight: 800; margin: 10px 0;
-            background: linear-gradient(45deg, #ff6b6b, #feca57, #ff9ff3, #54a0ff);
+            font-size: 2.3rem; font-weight: 800; margin: 10px 0 4px;
+            background: linear-gradient(45deg, #ffd97a, #ffb6e6 40%, #c9a4ff 70%, #8ec9ff);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             animation: flt2 3s infinite;
         }
         @keyframes flt2 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        .divider{
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            margin: 6px 0 14px; opacity: .75;
+        }
+        .divider::before, .divider::after{
+            content:""; height: 1px; width: 70px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+        .divider span{ color: var(--gold); font-size: .9rem; }
         .dt {
-            font-size: 1.1rem; color: #ffd700; background: rgba(255, 255, 255, 0.1);
+            font-size: 1.1rem; color: var(--gold); background: var(--pill-bg);
             display: inline-block; padding: 5px 15px; border-radius: 50px; margin-bottom: 10px;
+            transition: background .6s ease, color .6s ease;
         }
         .msg {
-            background: rgba(255, 255, 255, 0.08); padding: 20px; border-radius: 20px;
+            background: var(--msg-bg); padding: 20px; border-radius: 20px;
             margin: 10px 0; font-size: 1rem; line-height: 1.5; white-space: pre-line;
+            transition: background .6s ease;
         }
-        .emo { margin-top: 15px; font-size: 1.8rem; letter-spacing: 8px; }
-        .e { animation: bt 1.5s ease-in-out infinite; display: inline-block; }
+        .react-box{
+            margin-top: 18px; padding: 16px 10px; border-radius: 20px;
+            background: var(--card-bg); border: 1px solid var(--card-border);
+        }
+        .react-grid{
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+        }
+        .react-item{
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+            cursor: pointer; padding: 6px 2px; border-radius: 14px; user-select: none;
+            -webkit-tap-highlight-color: transparent; transition: transform .15s ease, background .2s ease;
+        }
+        .react-item:hover{ background: rgba(255,255,255,0.06); }
+        .react-item:active{ transform: scale(.92); }
+        .react-item .e{ font-size: 1.8rem; animation: bt 1.5s ease-in-out infinite; display: inline-block; }
+        .react-item .lbl{ font-size: 0.72rem; opacity: 0.75; font-weight: 500; }
         @keyframes bt { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
-        
-        .sh { margin-top: 15px; padding: 12px; background: rgba(255, 255, 255, 0.03); border-radius: 15px; }
-        .shb { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-        .sb {
-            padding: 8px 15px; border-radius: 50px; text-decoration: none;
-            color: white; font-size: 0.85rem; font-weight: 600; border: none; cursor: pointer;
+        .react-item.popped .e{ animation: popReact .5s ease; }
+        @keyframes popReact{
+            0%{ transform: scale(1); }
+            40%{ transform: scale(1.6) rotate(-10deg); }
+            100%{ transform: scale(1); }
         }
+        
+        .sh { margin-top: 15px; padding: 16px 12px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; transition: background .6s ease; }
+        .shb { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap; }
+        .sic {
+            width: 42px; height: 42px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; border: none; cursor: pointer; flex-shrink: 0;
+            color: white; box-shadow: 0 4px 12px rgba(0,0,0,.3);
+            transition: transform .15s ease, box-shadow .2s ease;
+        }
+        .sic svg{ display: block; }
+        .sic:hover{ transform: translateY(-3px) scale(1.06); box-shadow: 0 6px 16px rgba(0,0,0,.4); }
+        .sic:active{ transform: translateY(0) scale(.94); }
         .wa { background: #25D366; }
         .fb { background: #1877F2; }
-        .cp { background: #00f0ff; color: #000; }
-        .nb {
-            margin-top: 15px; width: 100%; background: rgba(255,255,255,0.1);
-            color: white; padding: 12px; font-size: 0.9rem; border: none;
-            border-radius: 50px; cursor: pointer;
+        .ig { background: radial-gradient(circle at 30% 110%, #ffdb8b 0%, #ee6055 25%, #d62976 45%, #962fbf 70%, #4f5bd5 100%); }
+        .cp-link {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%; margin-top: 16px; padding: 14px; border-radius: 50px;
+            background: rgba(255,215,0,0.06); color: var(--txt); font-size: 1rem; font-weight: 700;
+            border: 1px solid rgba(255,215,0,0.55); cursor: pointer;
+            transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+            box-shadow: 0 4px 18px rgba(255,215,0,.18);
         }
+        .cp-link:hover{ transform: translateY(-2px); background: rgba(255,215,0,0.12); box-shadow: 0 6px 22px rgba(255,215,0,.3); }
+        .cp-link:active{ transform: translateY(0) scale(.97); }
+        .nb {
+            margin-top: 14px; width: 100%; background: transparent;
+            color: var(--txt); padding: 13px; font-size: 0.95rem; font-weight: 600; border: 1px solid var(--card-border);
+            border-radius: 50px; cursor: pointer; transition: background .3s ease, color .3s ease, transform .15s ease, border-color .3s ease;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .nb:hover{ transform: translateY(-2px); border-color: rgba(255,215,0,0.5); }
         #c { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 100; }
+
+        /* ===== Responsive: phones, tablets, laptops, desktops ===== */
+        @media (max-width: 360px){
+            .card{ padding: 24px 16px; border-radius: 24px; }
+            .cake{ font-size: 2.8rem; }
+            .pic{ width: 160px; height: 160px; margin: 16px auto 20px; }
+            .glow{ width: 210px; height: 210px; }
+            .ph{ font-size: 3.6rem; }
+            .nm{ font-size: 1.9rem; }
+            .msg{ padding: 16px; font-size: 0.92rem; }
+            .emo{ font-size: 1.4rem; letter-spacing: 5px; }
+        }
+        @media (min-width: 361px) and (max-width: 480px){
+            .box{ padding: 16px; }
+            .pic{ width: 180px; height: 180px; }
+            .glow{ width: 235px; height: 235px; }
+        }
+        @media (min-width: 481px) and (max-width: 767px){
+            .box{ max-width: 480px; }
+            .card{ padding: 36px 28px; }
+        }
+        @media (min-width: 768px) and (max-width: 1024px){
+            .box{ max-width: 560px; }
+            .card{ padding: 44px 40px; border-radius: 34px; }
+            .pic{ width: 230px; height: 230px; }
+            .glow{ width: 290px; height: 290px; }
+            .nm{ font-size: 2.8rem; }
+            .msg{ font-size: 1.08rem; padding: 24px; }
+        }
+        @media (min-width: 1025px) and (max-width: 1440px){
+            .box{ max-width: 600px; }
+            .card{ padding: 42px 38px; }
+        }
+        @media (min-width: 1441px){
+            .box{ max-width: 650px; }
+            .card{ padding: 48px 44px; border-radius: 34px; }
+            .pic{ width: 220px; height: 220px; }
+            .nm{ font-size: 2.8rem; }
+        }
+        @media (max-height: 480px) and (orientation: landscape){
+            body{ align-items: flex-start; }
+            .box{ padding-top: 10px; }
+            .pic{ width: 140px; height: 140px; margin: 10px auto 14px; }
+            .glow{ width: 185px; height: 185px; }
+        }
+        @media (prefers-reduced-motion: reduce){
+            *, *::before, *::after{
+                animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -138,10 +256,17 @@
             <div class="sh">
                 <p style="font-size:0.8rem; opacity:0.6;">Share:</p>
                 <div class="shb">
-                    <a id="wa" class="sb wa" target="_blank">WhatsApp</a>
-                    <a id="fb" class="sb fb" target="_blank">Facebook</a>
-                    <button onclick="copy()" class="sb cp">Copy</button>
+                    <a id="wa" class="sic wa" target="_blank" aria-label="Share on WhatsApp">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.94.56 3.74 1.53 5.27L2 22l4.96-1.6a9.9 9.9 0 0 0 5.08 1.39h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.13-2.9-7C17.18 3.03 14.69 2 12.04 2zm0 18.13a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3.12 1 1.02-3.04-.2-.31a8.18 8.18 0 0 1-1.26-4.38c0-4.52 3.68-8.2 8.21-8.2 2.19 0 4.25.85 5.8 2.4a8.15 8.15 0 0 1 2.4 5.8c0 4.52-3.68 8.06-8.17 8.06zm4.49-6.13c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.16.25-.64.81-.78.97-.15.16-.29.18-.54.06-.25-.12-1.04-.38-1.99-1.23-.73-.65-1.23-1.46-1.37-1.71-.15-.25-.02-.39.1-.5.12-.12.27-.31.41-.47.13-.16.18-.27.27-.45.08-.18.04-.33-.04-.45-.08-.12-.5-1.21-.69-1.66-.18-.43-.37-.37-.5-.38-.13 0-.28-.01-.43-.01-.15 0-.39.06-.6.31-.21.25-.8.78-.8 1.9 0 1.12.82 2.2.93 2.35.12.16 1.59 2.43 3.86 3.31 1.92.74 2.31.6 2.73.56.41-.04 1.34-.55 1.53-1.08.18-.53.18-.99.13-1.08-.06-.1-.23-.16-.48-.28z"/></svg>
+                    </a>
+                    <a id="fb" class="sic fb" target="_blank" aria-label="Share on Facebook">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14C17.17 2.1 15.93 2 14.6 2 11.8 2 10 3.66 10 6.7V9.5H7v4h3V22h4v-8.5z"/></svg>
+                    </a>
+                    <a id="ig" class="sic ig" target="_blank" aria-label="Share on Instagram">
+                        <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.3"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor" stroke="none"/></svg>
+                    </a>
                 </div>
+                <button onclick="copy()" class="cp-link">🔗 Copy Link</button>
             </div>
 
             <button class="nb" onclick="location.href='index.html'">Create New</button>
@@ -231,6 +356,10 @@
                 const url = location.href;
                 document.getElementById('wa').href = `https://wa.me/?text=${encodeURIComponent("Surprise! 🎂 " + url)}`;
                 document.getElementById('fb').href = `https://facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+                document.getElementById('ig').href = `https://www.instagram.com/`;
+                document.getElementById('ig').onclick = () => {
+                    navigator.clipboard?.writeText(url).catch(()=>{});
+                };
                 
                 anim();
 
