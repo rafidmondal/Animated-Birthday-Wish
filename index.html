@@ -529,6 +529,7 @@
 
     <div class="container">
         <div class="card" id="tiltCard">
+            <button class="hist-btn" onclick="openHistory()">🕘 History</button>
             <div class="card-sheen" aria-hidden="true"></div>
             <button class="candle" id="themeToggle" aria-label="Toggle light/dark theme" onclick="toggleTheme(event)">🕯️</button>
             <div class="logo">Birthday Magic ✨</div>
@@ -573,6 +574,149 @@
             <button class="btn" onclick="create()">✨ Create</button>
             <p id="status"></p>
         </div>
+    </div>
+
+    <!-- ============================================================
+         LINK TYPE MODAL — shown after successful create()
+    ============================================================ -->
+    <style>
+      .lt-mod{ display:none; position:fixed; inset:0; background:rgba(6,4,16,0.72); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); z-index:10000; justify-content:center; align-items:center; padding:20px; }
+      .lt-mod.open{ display:flex; }
+      .lt-box{ width:100%; max-width:400px; background:linear-gradient(160deg, rgba(36,26,74,0.97), rgba(13,10,31,0.99)); border:1px solid var(--glass-border); border-radius:24px; padding:26px 22px; text-align:center; box-shadow:0 20px 60px -10px rgba(255,61,127,0.35); animation:ltPop .35s cubic-bezier(.2,.9,.3,1.3); }
+      @keyframes ltPop{ from{ opacity:0; transform:scale(.9) translateY(10px); } to{ opacity:1; transform:scale(1) translateY(0); } }
+      .lt-box h3{ font-size:1.15rem; margin-bottom:6px; color:var(--cloud); }
+      .lt-box p.sub{ font-size:0.82rem; opacity:0.65; margin-bottom:20px; }
+      .lt-opt{ display:block; width:100%; text-align:left; background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); border-radius:16px; padding:16px 16px; margin-bottom:12px; cursor:pointer; transition:border-color .2s ease, background .2s ease, transform .15s ease; }
+      .lt-opt:active{ transform:scale(.98); }
+      .lt-opt:hover{ border-color: var(--teal); background:rgba(52,232,199,0.08); }
+      .lt-opt .lt-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+      .lt-opt .lt-name{ font-weight:700; font-size:0.98rem; color:var(--cloud); }
+      .lt-opt .lt-tag{ font-size:0.66rem; font-weight:700; padding:3px 9px; border-radius:20px; letter-spacing:.4px; text-transform:uppercase; }
+      .lt-opt.big .lt-tag{ background:rgba(52,232,199,0.16); color: var(--teal); }
+      .lt-opt.short .lt-tag{ background:rgba(245,192,78,0.18); color: var(--gold); }
+      .lt-opt .lt-desc{ font-size:0.76rem; opacity:0.6; line-height:1.4; }
+      .lt-status{ font-size:0.78rem; opacity:0.7; min-height:18px; margin-top:6px; }
+
+      /* Result popup: shows the actual link + copy state */
+      .lt-result{ display:none; margin-top:6px; }
+      .lt-result.show{ display:block; }
+      .lt-copied-banner{ display:flex; align-items:center; gap:10px; background:rgba(52,232,199,0.14); border:1px solid rgba(52,232,199,0.35); border-radius:16px; padding:14px; margin-bottom:16px; }
+      .lt-copied-banner .lt-check{ width:34px; height:34px; flex-shrink:0; border-radius:50%; background:var(--teal); color:#04220f; display:flex; align-items:center; justify-content:center; font-size:1.1rem; font-weight:700; }
+      .lt-copied-banner .lt-copied-text{ text-align:left; }
+      .lt-copied-banner .lt-copied-text b{ display:block; font-size:0.92rem; color:var(--teal); }
+      .lt-copied-banner .lt-copied-text span{ font-size:0.72rem; opacity:0.7; }
+      .lt-linkbox{ display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.06); border:1px solid var(--glass-border); border-radius:14px; padding:10px 12px; margin-bottom:16px; }
+      .lt-linkbox input{ flex:1; min-width:0; background:transparent; border:none; outline:none; color:var(--cloud); font-size:0.78rem; }
+      .lt-copy-mini{ flex-shrink:0; padding:7px 11px; border-radius:10px; border:1px solid var(--teal); background:rgba(52,232,199,0.1); color:var(--teal); font-size:0.72rem; font-weight:700; cursor:pointer; white-space:nowrap; }
+      .lt-copy-mini:active{ transform:scale(.94); }
+      .lt-open-spacer{ height:2.6em; }
+      .lt-open-big{ display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:16px; border-radius:16px; border:none; background:linear-gradient(135deg, var(--rose), var(--rose-dark)); color:#fff; font-size:0.94rem; font-weight:800; cursor:pointer; box-shadow:0 10px 28px -6px rgba(255,61,127,0.55); transition:transform .1s ease;}
+      .lt-open-big:active{ transform:scale(.96); }
+      .lt-share-row{ display:flex; gap:8px; margin-bottom:6px; }
+      .lt-share-btn{ flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); border-radius:14px; padding:10px 6px; cursor:pointer; color:var(--cloud); font-size:0.66rem; transition:transform .1s ease, background .15s ease; }
+      .lt-share-btn:active{ transform:scale(.95); }
+      .lt-share-btn .lt-share-ic{ font-size:1.15rem; }
+      .lt-share-all{ flex-direction:row; justify-content:center; width:100%; padding:14px; margin-bottom:6px; gap:9px; font-size:0.88rem; font-weight:800; color:#1a1300; border:none; background:linear-gradient(135deg, var(--gold), #ffdb7a); box-shadow:0 8px 24px -6px rgba(245,192,78,0.55); }
+      .lt-share-all:active{ transform:scale(.96); }
+      .lt-share-all svg{ color:#1a1300; }
+      .lt-back{ margin-top:14px; font-size:0.76rem; opacity:0.55; cursor:pointer; text-decoration:underline; }
+
+      /* History button — small, top of card */
+      .hist-btn{ position:absolute; top:14px; left:14px; z-index:3; background:rgba(255,255,255,0.06); border:1px solid var(--glass-border); color: var(--cloud); font-size:0.68rem; padding:5px 10px; border-radius:20px; cursor:pointer; display:flex; align-items:center; gap:4px; }
+      .hist-btn:active{ transform:scale(.95); }
+      .hist-mod{ display:none; position:fixed; inset:0; background:rgba(6,4,16,0.72); backdrop-filter:blur(6px); z-index:10001; justify-content:center; align-items:center; padding:20px; }
+      .hist-mod.open{ display:flex; }
+      .hist-box{ width:100%; max-width:400px; max-height:75vh; overflow-y:auto; background:linear-gradient(160deg, rgba(36,26,74,0.97), rgba(13,10,31,0.99)); border:1px solid var(--glass-border); border-radius:24px; padding:20px; }
+      .hist-box h3{ font-size:1.05rem; margin-bottom:12px; }
+      .hist-item{ background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); border-radius:14px; padding:12px; margin-bottom:10px; text-align:left; }
+      .hist-item .hi-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
+      .hist-item .hi-name{ font-weight:700; font-size:0.88rem; }
+      .hist-item .hi-tag{ font-size:0.6rem; padding:2px 7px; border-radius:20px; text-transform:uppercase; font-weight:700; }
+      .hist-item.big .hi-tag{ background:rgba(52,232,199,0.16); color:var(--teal); }
+      .hist-item.short .hi-tag{ background:rgba(245,192,78,0.18); color:var(--gold); }
+      .hist-item .hi-date{ font-size:0.68rem; opacity:0.5; margin-bottom:8px; }
+      .hist-item button{ font-size:0.72rem; padding:6px 10px; border-radius:10px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.06); color:var(--cloud); cursor:pointer; }
+      .hist-empty{ text-align:center; opacity:0.5; font-size:0.82rem; padding:20px 0; }
+      .hist-close{ float:right; cursor:pointer; opacity:0.6; font-size:1.1rem; }
+    </style>
+
+    <div class="lt-mod" id="ltMod">
+      <div class="lt-box">
+
+        <div id="ltChoiceView">
+          <h3>🎉 Your Wish is Ready!</h3>
+          <p class="sub">Choose how you want to share it</p>
+
+          <div class="lt-opt big" onclick="chooseLink('big')">
+            <div class="lt-top">
+              <span class="lt-name">🔗 Big Link</span>
+              <span class="lt-tag">Permanent · Free</span>
+            </div>
+            <div class="lt-desc">Never expires. Copies instantly, no ad.</div>
+          </div>
+
+          <div class="lt-opt short" onclick="chooseLink('short')">
+            <div class="lt-top">
+              <span class="lt-name">⚡ Short Link</span>
+              <span class="lt-tag">Premium · 24–48h</span>
+            </div>
+            <div class="lt-desc">Short, clean link. Copies instantly + opens a quick ad tab. Expires in 24–48 hours.</div>
+          </div>
+
+          <p class="lt-status" id="ltStatus"></p>
+        </div>
+
+        <div class="lt-result" id="ltResultView">
+          <div class="lt-copied-banner">
+            <div class="lt-check">✓</div>
+            <div class="lt-copied-text">
+              <b id="ltResultTitle">Link Copied!</b>
+              <span id="ltResultSub">Already in your clipboard — just paste it anywhere.</span>
+            </div>
+          </div>
+          <div class="lt-linkbox">
+            <input type="text" id="ltLinkInput" readonly>
+            <button class="lt-copy-mini" onclick="copyLtLink()">📋 Copy</button>
+          </div>
+          <div class="lt-share-row">
+            <div class="lt-share-btn" onclick="shareLtLink('whatsapp')">
+              <svg class="lt-share-ic" viewBox="0 0 24 24" width="22" height="22" fill="#25D366"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.94.56 3.74 1.53 5.27L2 22l4.96-1.6a9.9 9.9 0 0 0 5.08 1.39h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.13-2.9-7C17.18 3.03 14.69 2 12.04 2zm0 18.13a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3.12 1 1.02-3.04-.2-.31a8.18 8.18 0 0 1-1.26-4.38c0-4.52 3.68-8.2 8.21-8.2 2.19 0 4.25.85 5.8 2.4a8.15 8.15 0 0 1 2.4 5.8c0 4.52-3.68 8.06-8.17 8.06zm4.49-6.13c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.16.25-.64.81-.78.97-.15.16-.29.18-.54.06-.25-.12-1.04-.38-1.99-1.23-.73-.65-1.23-1.46-1.37-1.71-.15-.25-.02-.39.1-.5.12-.12.27-.31.41-.47.13-.16.18-.27.27-.45.08-.18.04-.33-.04-.45-.08-.12-.5-1.21-.69-1.66-.18-.43-.37-.37-.5-.38-.13 0-.28-.01-.43-.01-.15 0-.39.06-.6.31-.21.25-.8.78-.8 1.9 0 1.12.82 2.2.93 2.35.12.16 1.59 2.43 3.86 3.31 1.92.74 2.31.6 2.73.56.41-.04 1.34-.55 1.53-1.08.18-.53.18-.99.13-1.08-.06-.1-.23-.16-.48-.28z"/></svg>
+              WhatsApp
+            </div>
+            <div class="lt-share-btn" onclick="shareLtLink('facebook')">
+              <svg class="lt-share-ic" viewBox="0 0 24 24" width="22" height="22" fill="#1877F2"><path d="M24 12.07C24 5.66 18.63.48 12 .48S0 5.66 0 12.07c0 5.8 4.39 10.6 10.13 11.43V15.4H7.08v-3.33h3.05V9.41c0-2.99 1.79-4.64 4.53-4.64 1.31 0 2.68.23 2.68.23v2.92h-1.51c-1.49 0-1.95.92-1.95 1.86v2.24h3.32l-.53 3.33h-2.79v8.1C19.61 22.67 24 17.87 24 12.07z"/></svg>
+              Facebook
+            </div>
+            <div class="lt-share-btn" onclick="shareLtLink('instagram')">
+              <svg class="lt-share-ic" viewBox="0 0 24 24" width="22" height="22"><defs><radialGradient id="igGrad" cx="30%" cy="107%" r="150%"><stop offset="0%" stop-color="#fdf497"/><stop offset="5%" stop-color="#fdf497"/><stop offset="45%" stop-color="#fd5949"/><stop offset="60%" stop-color="#d6249f"/><stop offset="90%" stop-color="#285AEB"/></radialGradient></defs><rect x="2" y="2" width="20" height="20" rx="5.5" fill="url(#igGrad)"/><circle cx="12" cy="12" r="4.3" fill="none" stroke="#fff" stroke-width="1.7"/><circle cx="17.4" cy="6.6" r="1.2" fill="#fff"/></svg>
+              Instagram
+            </div>
+          </div>
+          <div class="lt-share-btn lt-share-all" onclick="shareLtLink('all')">
+            <svg class="lt-share-ic" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" stroke-linecap="round"/></svg>
+            <span>Share to All Apps</span>
+          </div>
+
+          <div class="lt-open-spacer"></div>
+
+          <button class="lt-open-big" onclick="openLtLink()">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 3h6v6M10 14L21 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Open Wish Page</span>
+          </button>
+
+          <div class="lt-back" onclick="closeLtMod()">Close</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- History Modal -->
+    <div class="hist-mod" id="histMod">
+      <div class="hist-box">
+        <span class="hist-close" onclick="document.getElementById('histMod').classList.remove('open')">✕</span>
+        <h3>🕘 Your Links</h3>
+        <div id="histList"></div>
+      </div>
     </div>
 
     <!-- ============================================================
@@ -1633,6 +1777,56 @@
         const API = "https://urneinbrxacnwojhuvut.supabase.co/rest/v1/posts";
         const KEY = "sb_publishable_xLnFSAUTtuwpcdBjL2mu7w_k-zekj1K";
         
+        // ---------- Photo compression (same system as the Photo-URL tool) ----------
+        const PHOTO_MAX_WIDTH = 450;
+        const PHOTO_MAX_QUALITY = 0.92;
+        const PHOTO_MIN_QUALITY = 0.05;
+        const PHOTO_MIN_WIDTH = 120;
+        const PHOTO_TARGET_LEN = 15000; // target length of the base64 string itself
+
+        function buildPhotoData(img, width, quality) {
+            const height = Math.round(img.height * (width / img.width));
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            const dataUrl = canvas.toDataURL('image/jpeg', quality);
+            const base64 = dataUrl.split(',')[1];
+            return { base64, len: base64.length };
+        }
+
+        // Binary-search the highest quality (at a given width) that still fits under target length.
+        function bestPhotoQualityAtWidth(img, width, targetLen) {
+            let lo = PHOTO_MIN_QUALITY, hi = PHOTO_MAX_QUALITY;
+            let best = buildPhotoData(img, width, PHOTO_MIN_QUALITY);
+            if (best.len > targetLen) return best; // even min quality too big at this width
+
+            for (let i = 0; i < 7; i++) {
+                const mid = (lo + hi) / 2;
+                const candidate = buildPhotoData(img, width, mid);
+                if (candidate.len <= targetLen) {
+                    best = candidate;
+                    lo = mid;
+                } else {
+                    hi = mid;
+                }
+            }
+            return best;
+        }
+
+        function compressPhotoUnderTarget(img, targetLen) {
+            let width = Math.min(img.width, PHOTO_MAX_WIDTH);
+            let best = bestPhotoQualityAtWidth(img, width, targetLen);
+
+            while (best.len > targetLen && width > PHOTO_MIN_WIDTH) {
+                width = Math.max(PHOTO_MIN_WIDTH, Math.round(width * 0.85));
+                best = bestPhotoQualityAtWidth(img, width, targetLen);
+            }
+
+            return best.base64;
+        }
+
         let files = [];
 
         function preview() {
@@ -1646,23 +1840,18 @@
             });
         }
 
-        // Convert to base64 with compression
-        async function toBase64(file) {
+        // Convert to base64 with the same compress-under-target logic as the Photo-URL tool.
+        // targetLen lets us split the overall URL budget when there are 2 photos in one link.
+        async function toBase64(file, targetLen) {
             return new Promise((ok, err) => {
                 const r = new FileReader();
                 r.onload = e => {
                     const img = new Image();
                     img.onload = () => {
-                        const c = document.createElement('canvas');
-                        let w = img.width, h = img.height;
-                        const max = 400;
-                        if (w > h && w > max) { h *= max/w; w = max; }
-                        else if (h > max) { w *= max/h; h = max; }
-                        c.width = w; c.height = h;
-                        c.getContext('2d').drawImage(img, 0, 0, w, h);
-                        // Get base64 without prefix
-                        const base64 = c.toDataURL('image/jpeg', 0.6).split(',')[1];
-                        ok(base64);
+                        try {
+                            const base64 = compressPhotoUnderTarget(img, targetLen || PHOTO_TARGET_LEN);
+                            ok(base64);
+                        } catch(ex){ err(ex); }
                     };
                     img.onerror = err;
                     img.src = e.target.result;
@@ -1671,6 +1860,7 @@
                 r.readAsDataURL(file);
             });
         }
+
 
         async function create() {
             const name = document.getElementById('name').value.trim();
@@ -1682,75 +1872,43 @@
             btn.textContent = "Processing...";
 
             try {
-                // Convert photos to base64
+                // Convert photos to base64 (full per-photo budget — used for the Premium/Short
+                // link, which goes to supabase so URL length isn't a concern there).
                 let code1 = null, code2 = null;
-                
+
                 if (files.length > 0) {
                     st.textContent = "Converting photo 1...";
-                    code1 = await toBase64(files[0]);
-                    console.log("Photo 1 base64 length:", code1.length);
+                    code1 = await toBase64(files[0], PHOTO_TARGET_LEN);
                 }
-                
+
                 if (files.length > 1) {
                     st.textContent = "Converting photo 2...";
-                    code2 = await toBase64(files[1]);
-                    console.log("Photo 2 base64 length:", code2.length);
+                    code2 = await toBase64(files[1], PHOTO_TARGET_LEN);
                 }
 
-                st.textContent = "Saving...";
-
-                // Prepare data
                 const d = document.getElementById('day').value;
                 const m = document.getElementById('month').value;
                 const y = document.getElementById('year').value;
                 const msg = document.getElementById('msg').value.trim();
-                
                 const date = (d && m && y) ? `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}` : null;
-                
-                const data = {
+
+                // Hold the wish data in memory — nothing sent to supabase yet.
+                // Supabase is only used if the user picks Premium Short Link.
+                window._wishData = {
                     name: name,
                     birth_date: date,
                     message: msg || "Wishing you a wonderful birthday! 🎂",
                     photo_url: code1,
                     photo_url_2: code2
                 };
-                
-                console.log("📊 Data to save:");
-                console.log("- name:", data.name);
-                console.log("- photo_url length:", data.photo_url ? data.photo_url.length : 0);
-                console.log("- photo_url_2 length:", data.photo_url_2 ? data.photo_url_2.length : 0);
+                // Keep the raw files too, so the FREE Big Link can re-compress photos
+                // to a smaller combined budget (2 photos must share ~15k total).
+                window._wishFiles = files.slice();
 
-                // Save to database
-                const res = await fetch(API, {
-                    method: "POST",
-                    headers: {
-                        "apikey": KEY,
-                        "Authorization": `Bearer ${KEY}`,
-                        "Content-Type": "application/json",
-                        "Prefer": "return=representation"
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                console.log("📡 Save response status:", res.status);
-
-                if (!res.ok) {
-                    const err = await res.text();
-                    console.error("❌ Save error:", err);
-                    throw new Error("Save failed");
-                }
-
-                const saved = await res.json();
-                console.log("✅ Saved data:", saved);
-                const id = saved[0].id;
-                
-                console.log("🆔 Saved with ID:", id);
-                console.log("📸 Saved photo_url length:", saved[0].photo_url ? saved[0].photo_url.length : 0);
-                st.textContent = "Success!";
-                
-                setTimeout(() => {
-                    location.href = `index2.html?id=${id}`;
-                }, 500);
+                st.textContent = "Ready!";
+                document.getElementById('ltMod').classList.add('open');
+                btn.disabled = false;
+                btn.textContent = "✨ Create";
 
             } catch (e) {
                 console.error(e);
@@ -1759,6 +1917,275 @@
                 btn.textContent = "✨ Create";
                 alert("Failed! Check console (F12)");
             }
+        }
+
+        // ---------- localStorage history ----------
+        const HIST_KEY = 'abw_link_history';
+        const LAST_LINK_KEY = 'abw_last_link';
+
+        function getHistory(){
+            try { return JSON.parse(localStorage.getItem(HIST_KEY)) || []; }
+            catch(e){ return []; }
+        }
+
+        function saveToHistory(entry){
+            try {
+                const list = getHistory();
+                list.unshift(entry);
+                localStorage.setItem(HIST_KEY, JSON.stringify(list.slice(0, 30)));
+                // Also remember this as the "last generated link" so we can bring it
+                // back up automatically if the user leaves (e.g. to view the ad tab)
+                // and returns, without needing to dig through the History button.
+                localStorage.setItem(LAST_LINK_KEY, JSON.stringify(entry));
+            } catch(e){}
+        }
+
+        function clearLastLink(){
+            try { localStorage.removeItem(LAST_LINK_KEY); } catch(e){}
+        }
+
+        // Re-show the result popup for the most recently generated link.
+        // Used when the tab becomes visible again (e.g. user returns from the ad tab)
+        // and the popup isn't already open, so they never lose track of their link.
+        function resumeLastLinkIfAny(){
+            if (document.getElementById('ltMod').classList.contains('open')) return;
+            let entry = null;
+            try { entry = JSON.parse(localStorage.getItem(LAST_LINK_KEY)); } catch(e){}
+            if (!entry || !entry.url) return;
+
+            document.getElementById('ltChoiceView').style.display = 'none';
+            document.getElementById('ltMod').classList.add('open');
+            showLtResult(entry.url, entry.type);
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                resumeLastLinkIfAny();
+            }
+        });
+        window.addEventListener('pageshow', resumeLastLinkIfAny);
+
+        function copyText(text){
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                return navigator.clipboard.writeText(text).catch(() => fallbackCopyText(text));
+            }
+            return Promise.resolve(fallbackCopyText(text));
+        }
+
+        function fallbackCopyText(text){
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); } catch(e){}
+            document.body.removeChild(ta);
+        }
+
+        function showLtResult(url, type){
+            document.getElementById('ltChoiceView').style.display = 'none';
+            const rv = document.getElementById('ltResultView');
+            rv.classList.add('show');
+            document.getElementById('ltLinkInput').value = url;
+            document.getElementById('ltResultTitle').textContent = "Link Copied!";
+            document.getElementById('ltResultSub').textContent = type === 'big'
+                ? "Permanent link copied — already in your clipboard."
+                : "Short link copied — already in your clipboard. Expires in 24–48h.";
+        }
+
+        function shareLtLink(via){
+            const url = document.getElementById('ltLinkInput').value;
+            if (!url) return;
+            const text = "Surprise! 🎂 " + url;
+
+            if (via === 'whatsapp'){
+                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+            } else if (via === 'facebook'){
+                window.open(`https://facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+            } else if (via === 'instagram'){
+                // Instagram has no web share-with-link endpoint — copy the link and
+                // open Instagram so the user can paste it into a DM/story/bio.
+                copyText(url).then(() => {
+                    document.getElementById('ltResultSub').textContent = "Copied — paste it in Instagram.";
+                    window.open('https://www.instagram.com/', '_blank');
+                });
+            } else if (via === 'all'){
+                // Opens the phone's native share sheet — SMS, Telegram, Email, etc.
+                if (navigator.share) {
+                    navigator.share({ title: "Birthday Wish 🎂", text: "Surprise! 🎂", url }).catch(() => {});
+                } else {
+                    copyText(url).then(() => {
+                        document.getElementById('ltResultSub').textContent = "Copied — share isn't supported on this browser.";
+                    });
+                }
+            }
+        }
+
+        function copyLtLink(){
+            const url = document.getElementById('ltLinkInput').value;
+            copyText(url).then(() => {
+                document.getElementById('ltResultSub').textContent = "Copied again — ready to paste.";
+            });
+        }
+
+        function openLtLink(){
+            const url = document.getElementById('ltLinkInput').value;
+            if (!url) return;
+            window.open(url, '_blank');
+        }
+
+        function closeLtMod(){
+            document.getElementById('ltMod').classList.remove('open');
+            document.getElementById('ltChoiceView').style.display = 'block';
+            document.getElementById('ltResultView').classList.remove('show');
+            clearLastLink();
+        }
+
+        // ---------- Link type chooser (Big / Short) ----------
+        async function chooseLink(type){
+            const wish = window._wishData;
+            const name = wish ? wish.name : 'Birthday Wish';
+            if (!wish) return;
+
+            const ltStatus = document.getElementById('ltStatus');
+
+            if (type === 'big'){
+                // FREE + PERMANENT — pure base64, no supabase, no backend at all.
+                // All wish data is packed into the URL hash itself, so the TOTAL
+                // (both photos + text) must fit under the same ~15k budget the
+                // Photo-URL tool uses for a single photo.
+                if (ltStatus) ltStatus.textContent = "Preparing your link...";
+
+                try {
+                    const rawFiles = window._wishFiles || [];
+                    const textOverhead = JSON.stringify({
+                        name: wish.name, birth_date: wish.birth_date, message: wish.message
+                    }).length;
+                    // Final URL = btoa(JSON) — work backwards from PHOTO_TARGET_LEN so the
+                    // WHOLE final link (both photos + text) lands near that same budget,
+                    // instead of each photo alone hitting it.
+                    const maxJsonLen = Math.floor(PHOTO_TARGET_LEN * 3 / 4);
+                    const jsonOverhead = textOverhead + 80; // + JSON keys/quotes/commas
+                    const perPhotoBudget = rawFiles.length > 0
+                        ? Math.max(1500, Math.floor((maxJsonLen - jsonOverhead) / rawFiles.length))
+                        : PHOTO_TARGET_LEN;
+
+                    let smallCode1 = null, smallCode2 = null;
+                    if (rawFiles[0]) smallCode1 = await toBase64(rawFiles[0], perPhotoBudget);
+                    if (rawFiles[1]) smallCode2 = await toBase64(rawFiles[1], perPhotoBudget);
+
+                    const packedWish = {
+                        name: wish.name,
+                        birth_date: wish.birth_date,
+                        message: wish.message,
+                        photo_url: smallCode1,
+                        photo_url_2: smallCode2
+                    };
+
+                    const packed = JSON.stringify(packedWish);
+                    const b64 = btoa(unescape(encodeURIComponent(packed)));
+                    const url = `${location.origin}${location.pathname.replace(/index\.html$/, '')}index2.html#${b64}`;
+
+                    copyText(url).then(() => {
+                        showLtResult(url, 'big');
+                        saveToHistory({ type: 'big', url, name, id: null, createdAt: Date.now(), expiresAt: null });
+                    });
+                } catch (e) {
+                    console.error(e);
+                    if (ltStatus) ltStatus.textContent = "Failed to build link. Try again.";
+                }
+                return;
+            }
+
+            // type === 'short' -> PREMIUM — saves to supabase, gets a real short id link, copies instantly
+            if (ltStatus) ltStatus.textContent = "Generating your link...";
+
+            fetch(API, {
+                method: "POST",
+                headers: {
+                    "apikey": KEY,
+                    "Authorization": `Bearer ${KEY}`,
+                    "Content-Type": "application/json",
+                    "Prefer": "return=representation"
+                },
+                body: JSON.stringify(wish)
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Save failed");
+                return res.json();
+            })
+            .then(saved => {
+                const id = saved[0].id;
+                const url = `${location.origin}${location.pathname.replace(/index\.html$/, '')}index2.html?id=${id}`;
+                const expiresAt = Date.now() + (36 * 60 * 60 * 1000); // 24-48h window, display-only
+
+                copyText(url).then(() => {
+                    showLtResult(url, 'short');
+                    saveToHistory({ type: 'short', url, name, id, createdAt: Date.now(), expiresAt });
+                    openAdTab();
+                });
+            })
+            .catch(e => {
+                console.error(e);
+                if (ltStatus) ltStatus.textContent = "Failed to generate link. Try again.";
+            });
+        }
+
+
+        // Opens a real ad page (banner ad rendered) in a new tab
+        function openAdTab(){
+            const adHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Sponsored</title>
+                <style>body{margin:0;background:#0d0a1f;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:20px;font-family:sans-serif;}
+                p{color:#f4f1fb;opacity:.6;font-size:13px;}</style></head>
+                <body>
+                <p>Thanks for supporting Animated Birthday Wish 💖</p>
+                <div style="width:300px;max-width:100%;overflow:hidden;">
+                <script type="text/javascript">
+                atOptions = { 'key':'7071204c60a2e521a376ece26a39b5e8','format':'iframe','height':250,'width':300,'params':{} };
+                <\/script>
+                <script src="https://www.highrevenueformat.com/7071204c60a2e521a376ece26a39b5e8/invoke.js"><\/script>
+                </div>
+                </body></html>`;
+            const blob = new Blob([adHtml], { type: 'text/html' });
+            const blobUrl = URL.createObjectURL(blob);
+            window.open(blobUrl, '_blank');
+        }
+
+        // ---------- History modal ----------
+        function openHistory(){
+            const list = getHistory();
+            const el = document.getElementById('histList');
+            if (list.length === 0){
+                el.innerHTML = '<div class="hist-empty">No links yet. Create a wish to see it here.</div>';
+            } else {
+                const now = Date.now();
+                el.innerHTML = list.map(item => {
+                    const isShort = item.type === 'short';
+                    const expired = isShort && item.expiresAt && now > item.expiresAt;
+                    const dateStr = new Date(item.createdAt).toLocaleString();
+                    const statusStr = isShort
+                        ? (expired ? '⏳ Expired' : '⚡ Short · active')
+                        : '🔗 Permanent';
+                    return `<div class="hist-item ${item.type}">
+                        <div class="hi-top">
+                            <span class="hi-name">${escapeHtml(item.name)}</span>
+                            <span class="hi-tag">${item.type}</span>
+                        </div>
+                        <div class="hi-date">${dateStr} · ${statusStr}</div>
+                        <button onclick="copyText('${item.url}')">📋 Copy Link</button>
+                    </div>`;
+                }).join('');
+            }
+            document.getElementById('histMod').classList.add('open');
+        }
+
+        function escapeHtml(str){
+            const d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
         }
     </script>
 

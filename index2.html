@@ -347,16 +347,71 @@
         const KEY = "sb_publishable_xLnFSAUTtuwpcdBjL2mu7w_k-zekj1K";
         
         let iv = null;
-        
+
+        // Renders a wish object { name, birth_date, message, photo_url, photo_url_2 }
+        // Used by BOTH the free hash-based link and the premium supabase id link.
+        function renderWish(w){
+            document.getElementById('nm').textContent = w.name;
+
+            if (w.birth_date) {
+                const d = new Date(w.birth_date);
+                document.getElementById('dt').textContent = `📅 ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+            } else {
+                document.getElementById('dt').style.display = 'none';
+            }
+
+            document.getElementById('msg').textContent = w.message;
+
+            const codes = [];
+            if (w.photo_url && w.photo_url.length > 100) codes.push(w.photo_url);
+            if (w.photo_url_2 && w.photo_url_2.length > 100) codes.push(w.photo_url_2);
+
+            if (codes.length > 0) load(codes);
+
+            const url = location.href;
+            document.getElementById('wa').href = `https://wa.me/?text=${encodeURIComponent("Surprise! 🎂 " + url)}`;
+            document.getElementById('fb').href = `https://facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+            document.getElementById('ig').href = `https://www.instagram.com/`;
+            document.getElementById('ig').onclick = () => {
+                navigator.clipboard?.writeText(url).catch(()=>{});
+            };
+
+            anim();
+        }
+
+        // Decode the FREE link's base64 hash into a wish object — no backend involved.
+        function decodeHashWish(){
+            try {
+                const hash = location.hash.slice(1);
+                if (!hash) return null;
+                const json = decodeURIComponent(escape(atob(hash)));
+                return JSON.parse(json);
+            } catch(e){
+                return null;
+            }
+        }
+
         window.onload = async () => {
             const p = new URLSearchParams(location.search);
             const id = p.get('id');
-            
+
+            // FREE + PERMANENT link: everything is packed in the URL hash, zero backend calls.
+            if (!id && location.hash) {
+                const w = decodeHashWish();
+                if (!w) {
+                    document.getElementById('nm').textContent = "Invalid Link";
+                    return;
+                }
+                renderWish(w);
+                return;
+            }
+
             if (!id) {
                 document.getElementById('nm').textContent = "No ID";
                 return;
             }
 
+            // PREMIUM short link: fetch the wish from supabase by id.
             try {
                 const res = await fetch(`${API}?id=eq.${id}&select=*`, {
                     headers: {
@@ -373,64 +428,7 @@
                     return;
                 }
 
-                const w = data[0];
-                console.log("✅ Wish loaded");
-                console.log("📊 Keys:", Object.keys(w).join(', '));
-                console.log("📸 Has photo_url?", !!w.photo_url);
-                console.log("📸 Has photo_url_2?", !!w.photo_url_2);
-                
-                if (w.photo_url) {
-                    console.log("📸 photo_url type:", typeof w.photo_url);
-                    console.log("📸 photo_url length:", w.photo_url.length);
-                    console.log("📸 photo_url start:", w.photo_url.substring(0, 50));
-                }
-                
-                // Display content
-                document.getElementById('nm').textContent = w.name;
-                
-                if (w.birth_date) {
-                    const d = new Date(w.birth_date);
-                    document.getElementById('dt').textContent = `📅 ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
-                } else {
-                    document.getElementById('dt').style.display = 'none';
-                }
-                
-                document.getElementById('msg').textContent = w.message;
-                
-                // Load photos from base64
-                const codes = [];
-                if (w.photo_url && w.photo_url.length > 100) {
-                    codes.push(w.photo_url);
-                    console.log("✅ Photo 1 added to codes");
-                } else if (w.photo_url) {
-                    console.log("⚠️ Photo 1 too short:", w.photo_url.length);
-                }
-                
-                if (w.photo_url_2 && w.photo_url_2.length > 100) {
-                    codes.push(w.photo_url_2);
-                    console.log("✅ Photo 2 added to codes");
-                } else if (w.photo_url_2) {
-                    console.log("⚠️ Photo 2 too short:", w.photo_url_2.length);
-                }
-                
-                console.log("📸 Total valid photos to load:", codes.length);
-                
-                if (codes.length > 0) {
-                    load(codes);
-                } else {
-                    console.log("🎂 No valid photos found - placeholder remains");
-                }
-                
-                // Share
-                const url = location.href;
-                document.getElementById('wa').href = `https://wa.me/?text=${encodeURIComponent("Surprise! 🎂 " + url)}`;
-                document.getElementById('fb').href = `https://facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-                document.getElementById('ig').href = `https://www.instagram.com/`;
-                document.getElementById('ig').onclick = () => {
-                    navigator.clipboard?.writeText(url).catch(()=>{});
-                };
-                
-                anim();
+                renderWish(data[0]);
 
             } catch (e) {
                 console.error(e);
