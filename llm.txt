@@ -4,7 +4,7 @@ Create a Beautiful Birthday Surprise with a Personal Touch
 
 A birthday is more than just a date on the calendar. It is a special moment to celebrate someone's life, share happiness, and remind them how much they mean to us. Sometimes, even a simple birthday wish can make someone's day brighter — especially when it comes from the heart.
 
-Animated Birthday Wish by Raxzen is a free online tool that helps you turn an ordinary birthday message into a beautiful, personalized, animated birthday greeting. Instead of sending only a plain text message or a regular birthday image, you can create a special birthday page featuring the recipient's name, your personal message, and up to two photos.
+Animated Birthday Wish by Raxzen is a free online tool that helps you turn an ordinary birthday message into a beautiful, personalized, animated birthday greeting. Instead of sending only a plain text message or a regular birthday image, you can create a special birthday page featuring the recipient's name, your personal message.
 
 The process is simple, quick, and beginner-friendly. You do not need any graphic design experience, coding knowledge, or special software. Just enter a name, customize the greeting, add photos if you wish, and create your birthday surprise in a few easy steps.
 
@@ -107,9 +107,7 @@ Step 4: Write a Birthday Message
 Enter your own birthday wish or explore the available wish ideas to find a suitable message.
 
 Step 5: Add Photos (Optional)
-
-Choose up to two photos if you want to make the greeting more personal. You can also leave the photo section empty.
-
+Choose photos if you want to make the greeting more personal. You can also leave the photo section empty.
 Step 6: Create Your Birthday Greeting
 
 After entering the details you want to include, click the Create button to generate your birthday greeting.
@@ -184,7 +182,7 @@ Yes. You can enter a custom message or use the available birthday wish ideas for
 
 5. Can I add photos to my greeting?
 
-Yes. You can upload up to two photos when creating your birthday greeting.
+Yes. You can upload photos when creating your birthday greeting.
 
 6. Can I create a greeting without adding photos?
 

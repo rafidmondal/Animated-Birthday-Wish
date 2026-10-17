@@ -16,7 +16,7 @@ Think about the way people usually wish someone a happy birthday. Sometimes it i
 
 That is where Animated Birthday Wish comes in.
 
-The website gives users a straightforward way to prepare a personalized birthday greeting using the recipient's name, an optional birth date, a custom message, and up to two photos. After filling in the details, the user creates the greeting and shares its link with the birthday person.
+The website gives users a straightforward way to prepare a personalized birthday greeting using the recipient's name, an optional birth date, a custom message, and photos. After filling in the details, the user creates the greeting and shares its link with the birthday person.
 
 There is no need to design a card from scratch or learn how to edit graphics. The website brings the essential parts of the experience together in one place.
 
@@ -45,7 +45,7 @@ The primary fields are easy to understand:
 - Name
 - Birth date (optional)
 - Message (optional)
-- Photos (maximum two)
+- Photos(optional)
 - Create button
 
 A separate Wish Ideas button helps users who need inspiration, while the History button provides access to their recent links stored on their device.
@@ -72,7 +72,7 @@ The birth-date section follows, with separate day, month, and year fields. It is
 
 The message area provides room for a personal birthday wish. Its placement next to the Wish Ideas button makes it easier to either write a message independently or look for inspiration.
 
-The photo selection area is visually distinct, using a dashed outline and a camera symbol to communicate its purpose. The maximum of two photos is stated directly beside the section heading.
+The photo selection area is visually distinct, using a dashed outline and a camera symbol to communicate its purpose. photos is stated directly beside the section heading.
 
 Finally, the large Create button stands out through its bright gradient and prominent placement. It makes the next action easy to recognize without requiring the user to search through menus.
 
@@ -196,7 +196,7 @@ The process follows a simple sequence.
 2. Enter the recipient's name.
 3. Add a birth date if you want to include one.
 4. Write a personal message or open Wish Ideas for inspiration.
-5. Select up to two photos if you want to personalize the greeting further.
+5. Select photos if you want to personalize the greeting further.
 6. Press Create to generate the birthday page.
 7. Choose the available sharing option and send the link to the recipient.
 
